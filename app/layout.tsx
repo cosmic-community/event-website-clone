@@ -1,12 +1,14 @@
 import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
 import './globals.css'
 import Header from '@/components/Header'
-import CosmicBadge from '@/components/CosmicBadge'
+import Footer from '@/components/Footer'
+
+const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'EventHub - Discover Amazing Events',
-  description: 'A modern event discovery platform inspired by Luma. Find networking events, tech talks, workshops, and more.',
-  keywords: ['events', 'networking', 'tech talks', 'workshops', 'meetups'],
+  description: 'Find networking events, tech talks, workshops, and more happening near you.',
 }
 
 export default function RootLayout({
@@ -14,20 +16,12 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const bucketSlug = process.env.COSMIC_BUCKET_SLUG as string
-
   return (
     <html lang="en">
-      <head>
-        {/* Console capture script for dashboard debugging */}
-        <script src="/dashboard-console-capture.js" />
-      </head>
-      <body className="font-sans antialiased">
+      <body className={inter.className}>
         <Header />
-        <main className="min-h-screen">
-          {children}
-        </main>
-        <CosmicBadge bucketSlug={bucketSlug} />
+        <main>{children}</main>
+        <Footer />
       </body>
     </html>
   )

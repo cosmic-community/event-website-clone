@@ -3,11 +3,23 @@ import EventGrid from '@/components/EventGrid'
 import CategoryFilter from '@/components/CategoryFilter'
 import Hero from '@/components/Hero'
 
-export default async function HomePage() {
-  const [events, categories] = await Promise.all([
+interface HomePageProps {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}
+
+export default async function HomePage({ searchParams }: HomePageProps) {
+  const params = await searchParams
+  const categoryFilter = params.category as string | undefined
+
+  const [allEvents, categories] = await Promise.all([
     getEvents(),
     getCategories()
   ])
+
+  // Filter events by category if a category is selected
+  const filteredEvents = categoryFilter
+    ? allEvents.filter(event => event.metadata?.category?.id === categoryFilter)
+    : allEvents
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -27,7 +39,16 @@ export default async function HomePage() {
           <CategoryFilter categories={categories} />
         </div>
 
-        <EventGrid events={events} />
+        <div className="mb-4">
+          {categoryFilter && (
+            <div className="text-sm text-gray-600">
+              Showing {filteredEvents.length} {filteredEvents.length === 1 ? 'event' : 'events'} 
+              {categoryFilter && ` in ${categories.find(cat => cat.id === categoryFilter)?.metadata?.name || 'selected category'}`}
+            </div>
+          )}
+        </div>
+
+        <EventGrid events={filteredEvents} />
       </div>
     </div>
   )

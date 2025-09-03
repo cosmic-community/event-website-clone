@@ -1,7 +1,8 @@
 'use client'
 
 import { Category } from '@/types'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 interface CategoryFilterProps {
   categories: Category[]
@@ -9,7 +10,14 @@ interface CategoryFilterProps {
 }
 
 export default function CategoryFilter({ categories, className = '' }: CategoryFilterProps) {
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+
+  useEffect(() => {
+    const categoryParam = searchParams.get('category')
+    setSelectedCategory(categoryParam)
+  }, [searchParams])
 
   if (!categories || categories.length === 0) {
     return null
@@ -17,8 +25,18 @@ export default function CategoryFilter({ categories, className = '' }: CategoryF
 
   const handleCategoryClick = (categoryId: string | null) => {
     setSelectedCategory(categoryId)
-    // In a real app, this would trigger filtering logic
-    // For now, it's just visual feedback
+    
+    // Update URL with category filter
+    const params = new URLSearchParams(searchParams)
+    if (categoryId) {
+      params.set('category', categoryId)
+    } else {
+      params.delete('category')
+    }
+    
+    const queryString = params.toString()
+    const newUrl = queryString ? `/?${queryString}` : '/'
+    router.push(newUrl, { scroll: false })
   }
 
   return (
